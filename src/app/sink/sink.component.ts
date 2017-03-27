@@ -8,9 +8,9 @@ import { SinkService } from './sink.service';
 })
 export class SinkComponent {
 
-  constructor(private sinkService: SinkService) { 
+  constructor(public sinkService: SinkService) { 
 
-    this.sinkService.enable();
+    // this.sinkService.enable();
 
   }
 }

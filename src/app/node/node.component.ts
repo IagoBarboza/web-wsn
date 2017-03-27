@@ -8,9 +8,5 @@ import { NodeService } from './node.service';
 })
 export class NodeComponent {
 
-  constructor(private nodeService: NodeService) { 
-
-    this.nodeService.enable();
-
-  }
+  constructor(public nodeService: NodeService) {}
 }

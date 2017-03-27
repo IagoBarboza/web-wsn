@@ -4,6 +4,8 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 @Injectable()
 export class SinkService {
   
+  // Ligado / Desligado
+  private enabled = false;
   // Canais de comunicação  
   private channelN : FirebaseListObservable<any[]>; // Canal onde os nodes emitem e os sinks escutam
   private channelS : FirebaseListObservable<any[]>; // Canal onde os sinks emitem e os nodes escutam
@@ -27,25 +29,30 @@ export class SinkService {
   // Último tamanho do canal   
   private length=0;    
   // Buffer
-  public buffer=[];   
+  public buffer=[]; 
+  // Contador temporário de pacotes perdidos
+  private tempPackagesLost = 0; 
 
   constructor(af: AngularFire) { 
-    // this.id = Math.random()*100000000000000000;
+    // Identificador Aleatório
+    // this.id = Math.random()*10000000000000000000;
     // Observable do channelN
     this.channelN = af.database.list('channel-n');
     // Observable do channelS
     this.channelS = af.database.list('channel-s');
   }
 
+  // MÉTODO CHAMADO APÓS O EVENTO DE CLICK NO BOTÃO "LIGAR"
   enable(){
-    // LISTENING
+    
+    // ESCUTANDO NO CHANNEL-N
+    
     this.t1 = this.timer();
     this.t1.start(()=>{
         console.log('Escutando no canal');
         this.battery = this.battery - 1;
     }, 1);
 
-    // ESCUTANDO NO channelN
     this.channelN.subscribe(snapshots => {
         
         // Loop dos novos pacotes do channelN
@@ -62,13 +69,15 @@ export class SinkService {
                     this.packagesAccepted++;
                     this.buffer.push(snapshot);             
                 } 
-                // Se não tiver espaço no buffer para o novo pacote
+                // Se não tiver espaço no buffer para o novo pacote (BUFFER OVERFLOW)
                 else{
                     // Incrementa o número de pacotes rejeitados                
                     this.packagesUnaccepted++;
-                    // Envio de um pacote de alerta de diminuição de fluxo no channelS
-                    this.channelS.push({receiver:'all', sender:this.id, data:'decrease-frequency-of-transfer'});
+                    // Envio de um pacote de alerta de diminuição de fluxo no channelS (CONTROLE DE FLUXO)
+                    /////////////// HABILITAR O CONTROLE / DESABILITAR O CONTROLE /////////////////////////////
+                    // this.channelS.push({receiver:'all', sender:this.id, code:'decrease-frequency-of-transfer'});
                 }
+
             }
             // O destinatário não é esse sink
             else {
@@ -87,7 +96,7 @@ export class SinkService {
         // Se tiver pacote no buffer
         if(this.buffer.length >=1){
             // Desempilhando do buffer
-            this.buffer.pop();
+            this.buffer.splice(0, 1);
             // Incrementando o número de pacotes enviados à EB
             this.packagesSent++;
         }

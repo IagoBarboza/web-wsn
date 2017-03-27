@@ -32,11 +32,11 @@ export class NodeService {
   
   constructor(af: AngularFire) { 
     this.id = Math.random()*100000000000000000;
-    console.log(this.id);
     this.channelN = af.database.list('channel-n');
     this.channelS= af.database.list('channel-s');    
-}
+  }
 
+  // MÉTODO CHAMADO APÓS O EVENTO DE CLICK NO BOTÃO LIGAR
   enable(){
     // COLETANDO DADOS
     this.t1 = this.timer();
@@ -69,12 +69,14 @@ export class NodeService {
             this.packagesReceived++;
             // Pacote Atual
             let snapshot = snapshots[i];
-            // O destinatário do pacote é esse node ou o destinatário 
+            // O destinatário do pacote é esse node ou o destinatário são todos os nodes
             if(snapshot.receiver == this.id || snapshot.receiver == 'all'){
                 // Alerta de diminuição de frequência de transferência de pacotes
-                if(snapshot.data == 'decrease-frequency-of-transfer'){
-                    this.frequencyOfTransfer+=1000;                    
-                    this.t2.set_interval(this.frequencyOfTransfer);
+                if(snapshot.code == 'decrease-frequency-of-transfer'){
+                    if(this.frequencyOfTransfer<4000){
+                        this.frequencyOfTransfer+=1000;                    
+                        this.t2.set_interval(this.frequencyOfTransfer);
+                    }
                 }
             }
             // O destinatário não é esse node

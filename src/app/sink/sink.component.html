@@ -1,6 +1,7 @@
 <div fxLayout="column" fxLayoutAlign="center center">
     <h1>SINK {{sinkService.id}}</h1>
     <img src="../../assets/sensor.png">
+    <button md-button (click)="sinkService.enable()">Ligar</button>
     <h3>Bateria: {{sinkService.battery}}</h3>    
     <h3>Pacotes Recebidos: {{sinkService.packagesReceived}}</h3>
     <h3>Pacotes Aceitos: {{sinkService.packagesAccepted}}</h3>
