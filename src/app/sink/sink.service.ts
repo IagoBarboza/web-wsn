@@ -51,19 +51,27 @@ export class SinkService {
             this.packagesReceived++;
             // Pacote Atual
             let snapshot = snapshots[i];
-            // Se tiver espaço no buffer para o novo pacote
-            if(this.buffer.length < 4){
-                // Incremento no número de pacotes aceitos
-                this.packagesAccepted++;
-                this.buffer.push(snapshot);             
-            } 
-            // Se não tiver espaço no buffer para o novo pacote
-            else{
+            // O destinatário do pacote é esse sink
+            if(snapshot.sid == this.id){
+                // Se tiver espaço no buffer para o novo pacote
+                if(this.buffer.length < 4){
+                    // Incremento no número de pacotes aceitos
+                    this.packagesAccepted++;
+                    this.buffer.push(snapshot);             
+                } 
+                // Se não tiver espaço no buffer para o novo pacote
+                else{
+                    // Incrementa o número de pacotes rejeitados                
+                    this.packagesUnaccepted++;
+                    // Envio de um pacote de alerta de diminuição de fluxo
+                    // this.channel.push({nid:'all', sid:this.id, data:'decrease-frequency-of-transfer'});
+                }
+            }
+            // O destinatário não é esse sink
+            else {
                 // Incrementa o número de pacotes rejeitados                
-                this.packagesUnaccepted++;
-                // Envio de um pacote de alerta de diminuição de fluxo
-                // this.channel.push({nid:'all', sid:this.id, data:'decrease-frequency-of-transfer'});
-            } 
+                this.packagesUnaccepted++;    
+            }
         }
 
         // Armazenando o último tamanho do canal, para pegar apenas os novos pacotes
