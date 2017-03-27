@@ -75,7 +75,7 @@ export class SinkService {
                     this.packagesUnaccepted++;
                     // Envio de um pacote de alerta de diminuição de fluxo no channelS (CONTROLE DE FLUXO)
                     /////////////// HABILITAR O CONTROLE / DESABILITAR O CONTROLE /////////////////////////////
-                    // this.channelS.push({receiver:'all', sender:this.id, code:'decrease-frequency-of-transfer'});
+                    this.channelS.push({receiver:'all', sender:this.id, code:'decrease-frequency-of-transfer'});
                 }
 
             }

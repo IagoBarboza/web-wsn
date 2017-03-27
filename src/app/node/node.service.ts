@@ -61,7 +61,7 @@ export class NodeService {
         this.battery = this.battery - 1;
     }, 1); 
 
-    // ESCUTANDO NO channelS
+    // ESCUTANDO NO CHANNEL-S
     this.channelS.subscribe(snapshots => {
         // Loop dos novos pacotes do channelN
         for(let i=this.length; i<snapshots.length; i++){
@@ -73,10 +73,10 @@ export class NodeService {
             if(snapshot.receiver == this.id || snapshot.receiver == 'all'){
                 // Alerta de diminuição de frequência de transferência de pacotes
                 if(snapshot.code == 'decrease-frequency-of-transfer'){
-                    if(this.frequencyOfTransfer<4000){
+                    // if(this.frequencyOfTransfer<4000){
                         this.frequencyOfTransfer+=1000;                    
                         this.t2.set_interval(this.frequencyOfTransfer);
-                    }
+                    // }
                 }
             }
             // O destinatário não é esse node
