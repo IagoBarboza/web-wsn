@@ -34,7 +34,7 @@ export class NodeService {
   }
 
   enable(){
-    // DATA COLLECTION
+    // COLETANDO DADOS
     this.t1 = this.timer();
     this.t1.start(()=>{
         console.log(`Coletando dados`);
@@ -42,7 +42,7 @@ export class NodeService {
 				this.battery = this.battery - 10;
     }, 100, true);
 
-    // TRANSFER 
+    // ENVIANDO PACOTE 
     this.t2 = this.timer();
     this.t2.start(()=>{
       console.log("Enviando pacote");
@@ -50,7 +50,7 @@ export class NodeService {
       this.channel.push({nid:this.id, sid:this.sid, data:'Temperatura', status:'sent'});
     }, this.frequencyOfTransfer, true);
 
-    // LISTENING
+    // ESCUTANDO NO CANAL
     this.t3 = this.timer();
     this.t3.start(()=>{
         console.log('Escutando no canal');
