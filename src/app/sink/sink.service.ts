@@ -4,10 +4,11 @@ import { AngularFire, FirebaseListObservable } from 'angularfire2';
 @Injectable()
 export class SinkService {
   
-  // Communication Channel  
-  private channel : FirebaseListObservable<any[]>;
+  // Canais de comunicação  
+  private channelN : FirebaseListObservable<any[]>; // Canal onde os nodes emitem e os sinks escutam
+  private channelS : FirebaseListObservable<any[]>; // Canal onde os sinks emitem e os nodes escutam
   // Sink ID
-  public id;
+  public id = 12345;
   // Bateria (Unidades de energia)
   public battery = 1000000; 
   // Frequência de transferência (ms)
@@ -29,9 +30,11 @@ export class SinkService {
   public buffer=[];   
 
   constructor(af: AngularFire) { 
-    this.id = Math.random()*100000000000000000;
-    console.log(this.id);
-    this.channel = af.database.list('channel');
+    // this.id = Math.random()*100000000000000000;
+    // Observable do channelN
+    this.channelN = af.database.list('channel-n');
+    // Observable do channelS
+    this.channelS = af.database.list('channel-s');
   }
 
   enable(){
@@ -42,17 +45,17 @@ export class SinkService {
         this.battery = this.battery - 1;
     }, 1);
 
-    // ESCUTANDO O CANAL NO FIREBASE
-    this.channel.subscribe(snapshots => {
+    // ESCUTANDO NO channelN
+    this.channelN.subscribe(snapshots => {
         
-        // Loop dos novos pacotes do canal
+        // Loop dos novos pacotes do channelN
         for(let i=this.length; i<snapshots.length; i++){
             // Incremento no número de pacotes recebidos
             this.packagesReceived++;
             // Pacote Atual
             let snapshot = snapshots[i];
             // O destinatário do pacote é esse sink
-            if(snapshot.sid == this.id){
+            if(snapshot.receiver == this.id){
                 // Se tiver espaço no buffer para o novo pacote
                 if(this.buffer.length < 4){
                     // Incremento no número de pacotes aceitos
@@ -63,15 +66,15 @@ export class SinkService {
                 else{
                     // Incrementa o número de pacotes rejeitados                
                     this.packagesUnaccepted++;
-                    // Envio de um pacote de alerta de diminuição de fluxo
-                    // this.channel.push({nid:'all', sid:this.id, data:'decrease-frequency-of-transfer'});
+                    // Envio de um pacote de alerta de diminuição de fluxo no channelS
+                    this.channelS.push({receiver:'all', sender:this.id, data:'decrease-frequency-of-transfer'});
                 }
             }
             // O destinatário não é esse sink
             else {
                 // Incrementa o número de pacotes rejeitados                
                 this.packagesUnaccepted++;    
-            }
+            }   
         }
 
         // Armazenando o último tamanho do canal, para pegar apenas os novos pacotes
